@@ -17,6 +17,15 @@ jobs:
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
+        components: rustfmt, clippy
+
+    - name: Check Formatting
+      run: cargo fmt -- --check
+      working-directory: share_stewardship
+
+    - name: Run Linter (Clippy)
+      run: cargo clippy -- -D warnings
+      working-directory: share_stewardship
 
     - name: Build
       run: cargo build --verbose
