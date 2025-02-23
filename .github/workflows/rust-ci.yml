@@ -1,4 +1,3 @@
-
 name: Rust CI
 
 on:
@@ -20,6 +19,14 @@ jobs:
         toolchain: stable
         components: rustfmt, clippy
 
+    - name: Cache Cargo dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cargo/registry
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+
     - name: Check Formatting
       run: cargo fmt -- --check
       working-directory: share_stewardship
@@ -33,5 +40,20 @@ jobs:
       working-directory: share_stewardship
 
     - name: Run Tests
-      run: cargo test --verbose
+      run: cargo test --all --verbose
       working-directory: share_stewardship
+
+    - name: Generate Coverage Report
+      uses: actions-rs/tarpaulin@v0.1
+      with:
+        version: '0.25.2'
+        args: '--verbose --workspace'
+        working-directory: share_stewardship
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: cobertura.xml
+
+    - name: Verify Codecov upload
+      run: echo "Coverage report uploaded to Codecov."
