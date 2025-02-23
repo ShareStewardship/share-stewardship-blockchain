@@ -1,6 +1,6 @@
 use crate::dag::DAG;
-use crate::validator::Validator;
 use crate::transaction::Transaction;
+use crate::validator::Validator;
 
 pub struct Consensus<'a> {
     pub dag: &'a mut DAG,

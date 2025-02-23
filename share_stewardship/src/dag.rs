@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use crate::transaction::Transaction;
+use std::collections::HashMap;
 
 pub struct DAG {
     pub graph: HashMap<String, Transaction>,
@@ -7,7 +7,9 @@ pub struct DAG {
 
 impl DAG {
     pub fn new() -> Self {
-        DAG { graph: HashMap::new() }
+        DAG {
+            graph: HashMap::new(),
+        }
     }
 
     pub fn add_transaction(&mut self, transaction: Transaction) {
@@ -22,5 +24,5 @@ impl DAG {
         let mut transactions: Vec<&Transaction> = self.graph.values().collect();
         transactions.reverse();
         transactions.into_iter().take(limit).collect()
-    }    
+    }
 }

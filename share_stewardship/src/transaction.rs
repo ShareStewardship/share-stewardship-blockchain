@@ -10,7 +10,10 @@ pub struct Transaction {
 
 impl Transaction {
     pub fn new(sender: &str, recipient: &str, amount: f64, signature: &str) -> Self {
-        let tx_data = format!("{{\"sender\":\"{}\",\"recipient\":\"{}\",\"amount\":{}}}", sender, recipient, amount);
+        let tx_data = format!(
+            "{{\"sender\":\"{}\",\"recipient\":\"{}\",\"amount\":{}}}",
+            sender, recipient, amount
+        );
         let mut hasher = Sha256::new();
         hasher.update(tx_data);
         let tx_id = format!("{:x}", hasher.finalize());

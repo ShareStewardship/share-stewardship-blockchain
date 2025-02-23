@@ -1,12 +1,12 @@
-mod dag;
-mod validator;
 mod consensus;
+mod dag;
 mod transaction;
+mod validator;
 
-use dag::DAG;
-use validator::Validator;
 use consensus::Consensus;
+use dag::DAG;
 use transaction::Transaction;
+use validator::Validator;
 
 fn main() {
     let mut stewardship_dag = DAG::new();
