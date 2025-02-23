@@ -46,9 +46,7 @@ jobs:
     - name: Generate Coverage Report
       uses: actions-rs/tarpaulin@v0.1
       with:
-        version: '0.25.2'
-        args: '--verbose --workspace'
-        working-directory: share_stewardship
+        args: '--verbose --workspace --out Xml'
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
@@ -56,4 +54,4 @@ jobs:
         files: cobertura.xml
 
     - name: Verify Codecov upload
-      run: echo "Coverage report uploaded to Codecov."
+      run: echo \"Coverage report uploaded to Codecov.\"
