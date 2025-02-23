@@ -44,9 +44,12 @@ jobs:
       working-directory: share_stewardship
 
     - name: Generate Coverage Report
-      uses: actions-rs/tarpaulin@v0.1
-      with:
-        args: '--verbose --workspace --out Xml'
+    uses: actions-rs/tarpaulin@v0.1
+    with:
+    version: '0.27.3'  # use a stable and existing version
+    args: '--verbose --workspace --out Xml'
+    working-directory: share_stewardship
+
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
