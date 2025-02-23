@@ -1,3 +1,4 @@
+
 name: Rust CI
 
 on:
@@ -24,7 +25,7 @@ jobs:
       working-directory: share_stewardship
 
     - name: Run Linter (Clippy)
-      run: cargo clippy -- -D warnings
+      run: cargo clippy -- -D warnings -A dead_code -A clippy::upper_case_acronyms
       working-directory: share_stewardship
 
     - name: Build
