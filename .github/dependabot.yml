@@ -6,6 +6,8 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 10
     target-branch: "ss-dag-development"
+    reviewers:
+      - "gtq33"
 
   - package-ecosystem: "github-actions"
     directory: "/"
