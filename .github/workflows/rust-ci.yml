@@ -8,6 +8,10 @@ on:
   schedule:
     - cron: '0 0 * * 0'  # Weekly dependency audit
 
+permissions:
+  contents: write
+  security-events: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
