@@ -47,8 +47,7 @@ jobs:
         uses: actions-rs/tarpaulin@v0.1
         with:
           version: '0.27.3'
-          args: '--verbose --workspace --out Xml'
-          working-directory: share_stewardship
+          args: '--verbose --workspace --out Xml --manifest-path share_stewardship/Cargo.toml'
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
