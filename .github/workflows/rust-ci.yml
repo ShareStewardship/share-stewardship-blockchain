@@ -86,6 +86,7 @@ jobs:
         uses: actions-rs/audit-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          args: "--manifest-path share_stewardship/Cargo.toml"
 
       - name: Notify on audit failure
         if: failure()
