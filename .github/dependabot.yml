@@ -1,9 +1,0 @@
-version: 2
-updates:
-  - package-ecosystem: "cargo"
-    directory: "/share_stewardship"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 10
-    reviewers:
-      - "gtq33"
