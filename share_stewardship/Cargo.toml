@@ -1,0 +1,4 @@
+[package]
+name = "correct_dag_module_name" # <-- This is the correct package name
+version = "0.1.0"
+edition = "2021"
