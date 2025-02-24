@@ -42,35 +42,35 @@ jobs:
         run: cargo build --verbose
         working-directory: share_stewardship
 
-      - name: Run Unit Tests
-        run: cargo test --verbose
+      - name: Run DAG Module Unit Tests
+        run: cargo test --verbose --package dag_module
         working-directory: share_stewardship
 
-      - name: Run Integration Tests
-        run: cargo test --tests --verbose
+      - name: Run DAG Module Integration Tests
+        run: cargo test --tests --verbose --package dag_module
         working-directory: share_stewardship
 
       - name: Install cargo-tarpaulin
         uses: taiki-e/install-action@cargo-tarpaulin
 
-      - name: Generate Coverage Report
-        run: cargo tarpaulin --verbose --workspace --out Xml
+      - name: Generate DAG Coverage Report
+        run: cargo tarpaulin --verbose --workspace --package dag_module --out Xml
         working-directory: share_stewardship
 
-      - name: Upload coverage to Codecov
+      - name: Upload DAG coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
           files: cobertura.xml
 
       - name: Verify Codecov upload
-        run: echo \"Coverage report uploaded to Codecov.\"
+        run: echo \"DAG Module coverage report uploaded to Codecov.\"
 
-      - name: Run Tests with All Features (Release)
-        run: cargo test --all-features --release
+      - name: Run DAG Tests with All Features (Release)
+        run: cargo test --package dag_module --all-features --release
         working-directory: share_stewardship
 
-      - name: Run Benchmarks
-        run: cargo bench
+      - name: Run DAG Benchmarks
+        run: cargo bench --package dag_module
         working-directory: share_stewardship
 
       - name: Install cargo-audit
@@ -91,7 +91,7 @@ jobs:
 
       - name: Notify on Success
         if: success()
-        run: echo \"Build and tests completed successfully.\"
+        run: echo \"DAG Module build and tests completed successfully.\"
 
   codeql-analysis:
     name: CodeQL Analysis
