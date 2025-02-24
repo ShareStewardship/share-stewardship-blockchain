@@ -36,30 +36,24 @@ jobs:
 
       - name: Check Formatting
         run: cargo fmt -- --check
-        working-directory: correct_dag_module_name
 
       - name: Run Linter (Clippy)
         run: cargo clippy -- -D warnings -A dead_code -A clippy::upper_case_acronyms
-        working-directory: correct_dag_module_name
 
       - name: Build
         run: cargo build --verbose
-        working-directory: correct_dag_module_name
 
       - name: Run DAG Module Unit Tests
         run: cargo test --lib --verbose
-        working-directory: correct_dag_module_name
 
       - name: Run DAG Module Integration Tests
         run: cargo test --tests --verbose
-        working-directory: correct_dag_module_name
 
       - name: Install cargo-tarpaulin
         uses: taiki-e/install-action@cargo-tarpaulin
 
       - name: Generate DAG Coverage Report
         run: cargo tarpaulin --verbose --workspace --out Xml
-        working-directory: correct_dag_module_name
 
       - name: Upload DAG coverage to Codecov
         uses: codecov/codecov-action@v3
@@ -71,18 +65,15 @@ jobs:
 
       - name: Run DAG Tests with All Features (Release)
         run: cargo test --all-features --release
-        working-directory: correct_dag_module_name
 
       - name: Run DAG Benchmarks
         run: cargo bench
-        working-directory: correct_dag_module_name
 
       - name: Install cargo-audit
         run: cargo install cargo-audit
 
       - name: Security Audit
         run: cargo audit
-        working-directory: correct_dag_module_name
 
       - name: Slack Notification
         uses: 8398a7/action-slack@v3
