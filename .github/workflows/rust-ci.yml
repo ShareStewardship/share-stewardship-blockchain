@@ -63,7 +63,7 @@ jobs:
           files: cobertura.xml
 
       - name: Verify Codecov upload
-        run: echo "DAG Module coverage report uploaded to Codecov."
+        run: echo \"DAG Module coverage report uploaded to Codecov.\"
 
       - name: Run DAG Tests with All Features (Release)
         run: cargo test --all-features --release
@@ -97,6 +97,19 @@ jobs:
           fields: repo,commit,message,job,took
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Tag Release on Success
+        if: success()
+        uses: anothrNick/github-tag-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+
+      - name: Generate Changelog
+        if: success()
+        uses: heinrichreimer/github-changelog-generator-action@v2.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   codeql-analysis:
     name: CodeQL Analysis
