@@ -4,6 +4,12 @@ updates:
     directory: "/share_stewardship"
     schedule:
       interval: "weekly"
-    target-branch: "ss-dag-development"
     open-pull-requests-limit: 10
+    target-branch: "ss-dag-development"
 
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    target-branch: "ss-dag-development"
