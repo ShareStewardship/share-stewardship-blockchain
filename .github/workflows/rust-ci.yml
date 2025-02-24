@@ -2,9 +2,9 @@ name: Rust CI
 
 on:
   push:
-    branches: [ main, ss-dag-development ]
+    branches: [ ss-dag-development ]
   pull_request:
-    branches: [ main, ss-dag-development ]
+    branches: [ ss-dag-development ]
   schedule:
     - cron: '0 0 * * 0'
 
@@ -35,25 +35,37 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Check Formatting
-        run: cargo fmt --all -- --check
+        run: |
+          cd share_stewardship
+          cargo fmt --all -- --check
 
       - name: Run Linter (Clippy)
-        run: cargo clippy -- -D warnings -A dead_code -A clippy::upper_case_acronyms
+        run: |
+          cd share_stewardship
+          cargo clippy -- -D warnings -A dead_code -A clippy::upper_case_acronyms
 
       - name: Build
-        run: cargo build --verbose
+        run: |
+          cd share_stewardship
+          cargo build --verbose
 
       - name: Run DAG Module Unit Tests
-        run: cargo test --lib --verbose
+        run: |
+          cd share_stewardship
+          cargo test --lib --verbose
 
       - name: Run DAG Module Integration Tests
-        run: cargo test --tests --verbose
+        run: |
+          cd share_stewardship
+          cargo test --tests --verbose
 
       - name: Install cargo-tarpaulin
         uses: taiki-e/install-action@cargo-tarpaulin
 
       - name: Generate DAG Coverage Report
-        run: cargo tarpaulin --verbose --workspace --out Xml
+        run: |
+          cd share_stewardship
+          cargo tarpaulin --verbose --workspace --out Xml
 
       - name: Upload DAG coverage to Codecov
         uses: codecov/codecov-action@v3
@@ -64,16 +76,43 @@ jobs:
         run: echo "DAG Module coverage report uploaded to Codecov."
 
       - name: Run DAG Tests with All Features (Release)
-        run: cargo test --all-features --release
+        run: |
+          cd share_stewardship
+          cargo test --all-features --release
 
       - name: Run DAG Benchmarks
-        run: cargo bench
+        run: |
+          cd share_stewardship
+          cargo bench
 
       - name: Install cargo-audit
         run: cargo install cargo-audit
 
       - name: Security Audit
-        run: cargo audit
+        run: |
+          cd share_stewardship
+          cargo audit
+
+      - name: Slack Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,commit,message,job,took
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Tag and Release
+        if: success()
+        uses: anothrNick/github-tag-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+
+      - name: Generate Changelog
+        if: success()
+        uses: heinrichreimer/github-changelog-generator-action@v2.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   codeql-analysis:
     name: CodeQL Analysis
@@ -97,3 +136,11 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
+
+      - name: Slack Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,commit,message,job,took
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
