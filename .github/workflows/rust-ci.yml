@@ -11,50 +11,49 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        components: rustfmt, clippy
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
 
-    - name: Cache Cargo dependencies
-      uses: actions/cache@v3
-      with:
-        path: ~/.cargo/registry
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-cargo-
+      - name: Cache Cargo dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
 
-    - name: Check Formatting
-      run: cargo fmt -- --check
-      working-directory: share_stewardship
+      - name: Check Formatting
+        run: cargo fmt -- --check
+        working-directory: share_stewardship
 
-    - name: Run Linter (Clippy)
-      run: cargo clippy -- -D warnings -A dead_code -A clippy::upper_case_acronyms
-      working-directory: share_stewardship
+      - name: Run Linter (Clippy)
+        run: cargo clippy -- -D warnings -A dead_code -A clippy::upper_case_acronyms
+        working-directory: share_stewardship
 
-    - name: Build
-      run: cargo build --verbose
-      working-directory: share_stewardship
+      - name: Build
+        run: cargo build --verbose
+        working-directory: share_stewardship
 
-    - name: Run Tests
-      run: cargo test --all --verbose
-      working-directory: share_stewardship
+      - name: Run Tests
+        run: cargo test --all --verbose
+        working-directory: share_stewardship
 
-    - name: Generate Coverage Report
-    uses: actions-rs/tarpaulin@v0.1
-    with:
-    version: '0.27.3'  # use a stable and existing version
-    args: '--verbose --workspace --out Xml'
-    working-directory: share_stewardship
+      - name: Generate Coverage Report
+        uses: actions-rs/tarpaulin@v0.1
+        with:
+          version: '0.27.3'
+          args: '--verbose --workspace --out Xml'
+          working-directory: share_stewardship
 
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: cobertura.xml
 
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        files: cobertura.xml
-
-    - name: Verify Codecov upload
-      run: echo \"Coverage report uploaded to Codecov.\"
+      - name: Verify Codecov upload
+        run: echo \"Coverage report uploaded to Codecov.\"
