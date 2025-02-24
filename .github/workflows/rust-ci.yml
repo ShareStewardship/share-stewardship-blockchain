@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ ss-dag-development ]
   schedule:
-    - cron: '0 0 * * 0'  # Weekly dependency audit
+    - cron: '0 0 * * 0'
 
 permissions:
   contents: write
@@ -18,7 +18,7 @@ jobs:
     timeout-minutes: 30
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install Rust
         uses: actions-rs/toolchain@v1
@@ -47,7 +47,7 @@ jobs:
         working-directory: share_stewardship
 
       - name: Run DAG Module Unit Tests
-        run: cargo test --verbose
+        run: cargo test --lib --verbose
         working-directory: share_stewardship
 
       - name: Run DAG Module Integration Tests
@@ -84,8 +84,7 @@ jobs:
         run: cargo audit
         working-directory: share_stewardship
 
-      - name: Notify Slack on build or audit failure
-        if: failure()
+      - name: Slack Notification
         uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
@@ -93,16 +92,7 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-      - name: Notify Slack on Success
-        if: success()
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          fields: repo,commit,message,job,took
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-      - name: Tag Release on Success
+      - name: Tag and Release
         if: success()
         uses: anothrNick/github-tag-action@v1
         env:
@@ -123,8 +113,9 @@ jobs:
       security-events: write
     env:
       CODEQL_ENABLE_EXPERIMENTAL_FEATURES: true
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
@@ -137,17 +128,7 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
 
-      - name: Slack Notification on CodeQL Analysis Failure
-        if: failure()
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          fields: repo,commit,message,job,took
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-      - name: Slack Notification on CodeQL Analysis Success
-        if: success()
+      - name: Slack Notification
         uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
