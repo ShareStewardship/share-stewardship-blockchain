@@ -1,0 +1,79 @@
+name: Rust DAG aBFT CI
+
+on:
+  push:
+    branches: [ main, ss-dag-development ]
+  pull_request:
+    branches: [ main, ss-dag-development ]
+  schedule:
+    - cron: '0 0 * * 0'
+
+permissions:
+  contents: write
+  security-events: write
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+
+      - name: Cache Cargo dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Format Check
+        run: cargo fmt --all -- --check
+
+      - name: Clippy Lints
+        run: cargo clippy -- -D warnings
+
+      - name: Build DAG Module
+        run: cargo build --verbose
+
+      - name: DAG Module Unit Tests
+        run: cargo test --lib --verbose
+
+      - name: DAG Integration Tests
+        run: cargo test --tests --verbose
+
+      - name: Security Audit
+        run: |
+          cargo install cargo-audit
+          cargo audit
+
+  consensus-abft:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Setup DAG Environment
+        run: cargo build
+
+      - name: Run aBFT Consensus Basic Tests
+        run: cargo test --test consensus_abft --verbose
+
+      - name: CodeQL Analysis
+        uses: github/codeql-action/init@v3
+        with:
+          languages: rust
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
