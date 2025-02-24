@@ -63,7 +63,7 @@ jobs:
           files: cobertura.xml
 
       - name: Verify Codecov upload
-        run: echo "Coverage report uploaded to Codecov."
+        run: echo \"Coverage report uploaded to Codecov.\"
 
       - name: Run Tests with All Features (Release)
         run: cargo test --all-features --release
@@ -91,7 +91,7 @@ jobs:
 
       - name: Notify on Success
         if: success()
-        run: echo "Build and tests completed successfully."
+        run: echo \"Build and tests completed successfully.\"
 
   codeql-analysis:
     name: CodeQL Analysis
@@ -114,10 +114,3 @@ jobs:
           fields: repo,commit,message,job,took
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-# Dependabot configuration for automated dependency updates
-dependabot:
-  schedule:
-    interval: weekly
-  open-pull-requests-limit: 10
-  target-branch: ss-dag-development
