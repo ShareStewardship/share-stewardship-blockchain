@@ -1,15 +1,116 @@
-version: 2
-updates:
-  - package-ecosystem: "cargo"
-    directory: "/share_stewardship"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 10
-    target-branch: "ss-dag-development"
+name: Rust CI
 
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 10
-    target-branch: "ss-dag-development"
+on:
+  push:
+    branches: [ ss-dag-development ]
+  pull_request:
+    branches: [ ss-dag-development ]
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly dependency audit
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+
+      - name: Cache Cargo dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Check Formatting
+        run: cargo fmt -- --check
+        working-directory: share_stewardship
+
+      - name: Run Linter (Clippy)
+        run: cargo clippy -- -D warnings -A dead_code -A clippy::upper_case_acronyms
+        working-directory: share_stewardship
+
+      - name: Build
+        run: cargo build --verbose
+        working-directory: share_stewardship
+
+      - name: Run Unit Tests
+        run: cargo test --verbose
+        working-directory: share_stewardship
+
+      - name: Run Integration Tests
+        run: cargo test --tests --verbose
+        working-directory: share_stewardship
+
+      - name: Install cargo-tarpaulin
+        uses: taiki-e/install-action@cargo-tarpaulin
+
+      - name: Generate Coverage Report
+        run: cargo tarpaulin --verbose --workspace --out Xml
+        working-directory: share_stewardship
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: cobertura.xml
+
+      - name: Verify Codecov upload
+        run: echo \"Coverage report uploaded to Codecov.\"
+
+      - name: Run Tests with All Features (Release)
+        run: cargo test --all-features --release
+        working-directory: share_stewardship
+
+      - name: Run Benchmarks
+        run: cargo bench
+        working-directory: share_stewardship
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit
+
+      - name: Security Audit
+        run: cargo audit
+        working-directory: share_stewardship
+
+      - name: Notify Slack on audit failure
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,commit,message,job,took
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Notify on Success
+        if: success()
+        run: echo \"Build and tests completed successfully.\"
+
+  codeql-analysis:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v3
+      - uses: github/codeql-action/init@v2
+        with:
+          languages: rust
+          queries: security-and-quality
+      - uses: github/codeql-action/autobuild@v2
+      - uses: github/codeql-action/analyze@v2
+
+      - name: Slack Notification on CodeQL Analysis Failure
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,commit,message,job,took
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
