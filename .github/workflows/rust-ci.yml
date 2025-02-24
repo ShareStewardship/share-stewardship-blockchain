@@ -63,7 +63,7 @@ jobs:
           files: cobertura.xml
 
       - name: Verify Codecov upload
-        run: echo \"DAG Module coverage report uploaded to Codecov.\"
+        run: echo "DAG Module coverage report uploaded to Codecov."
 
       - name: Run DAG Tests with All Features (Release)
         run: cargo test --all-features --release
@@ -80,7 +80,7 @@ jobs:
         run: cargo audit
         working-directory: share_stewardship
 
-      - name: Notify Slack on audit failure
+      - name: Notify Slack on build or audit failure
         if: failure()
         uses: 8398a7/action-slack@v3
         with:
@@ -89,9 +89,14 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-      - name: Notify on Success
+      - name: Notify Slack on Success
         if: success()
-        run: echo \"DAG Module build and tests completed successfully.\"
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,commit,message,job,took
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   codeql-analysis:
     name: CodeQL Analysis
@@ -117,6 +122,15 @@ jobs:
 
       - name: Slack Notification on CodeQL Analysis Failure
         if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,commit,message,job,took
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Slack Notification on CodeQL Analysis Success
+        if: success()
         uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
