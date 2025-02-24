@@ -99,6 +99,8 @@ jobs:
     timeout-minutes: 30
     permissions:
       security-events: write
+    env:
+      CODEQL_ENABLE_EXPERIMENTAL_FEATURES: true
     steps:
       - uses: actions/checkout@v3
 
