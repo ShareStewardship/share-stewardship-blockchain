@@ -43,18 +43,18 @@ jobs:
         working-directory: share_stewardship
 
       - name: Run DAG Module Unit Tests
-        run: cargo test --verbose --package dag_module
+        run: cargo test --verbose
         working-directory: share_stewardship
 
       - name: Run DAG Module Integration Tests
-        run: cargo test --tests --verbose --package dag_module
+        run: cargo test --tests --verbose
         working-directory: share_stewardship
 
       - name: Install cargo-tarpaulin
         uses: taiki-e/install-action@cargo-tarpaulin
 
       - name: Generate DAG Coverage Report
-        run: cargo tarpaulin --verbose --workspace --package dag_module --out Xml
+        run: cargo tarpaulin --verbose --workspace --out Xml
         working-directory: share_stewardship
 
       - name: Upload DAG coverage to Codecov
@@ -66,11 +66,11 @@ jobs:
         run: echo \"DAG Module coverage report uploaded to Codecov.\"
 
       - name: Run DAG Tests with All Features (Release)
-        run: cargo test --package dag_module --all-features --release
+        run: cargo test --all-features --release
         working-directory: share_stewardship
 
       - name: Run DAG Benchmarks
-        run: cargo bench --package dag_module
+        run: cargo bench
         working-directory: share_stewardship
 
       - name: Install cargo-audit
