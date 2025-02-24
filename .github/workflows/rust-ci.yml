@@ -35,7 +35,8 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Check Formatting
-        run: cargo fmt --manifest-path Cargo.toml --all -- --check
+        run: |
+          cargo fmt --all -- --check
 
       - name: Run Linter (Clippy)
         run: cargo clippy -- -D warnings -A dead_code -A clippy::upper_case_acronyms
