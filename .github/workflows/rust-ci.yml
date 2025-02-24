@@ -72,9 +72,8 @@ jobs:
         working-directory: share_stewardship
 
       - name: Security Audit
-        uses: actions-rs/audit-check@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+        run: cargo audit
+        working-directory: share_stewardship
 
       - name: Notify on audit failure
         if: failure()
