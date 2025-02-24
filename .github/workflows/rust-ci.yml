@@ -43,12 +43,12 @@ jobs:
         run: cargo test --all --verbose
         working-directory: share_stewardship
 
+      - name: Install cargo-tarpaulin
+        uses: taiki-e/install-action@cargo-tarpaulin
+
       - name: Generate Coverage Report
-        uses: actions-rs/tarpaulin@v0.1
-        with:
-          version: '0.27.2'  # known available version with binaries
-          args: '--verbose --workspace --out Xml --manifest-path share_stewardship/Cargo.toml'
-      
+        run: cargo tarpaulin --verbose --workspace --out Xml
+        working-directory: share_stewardship
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
