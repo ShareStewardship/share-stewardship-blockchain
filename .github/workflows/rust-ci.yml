@@ -36,25 +36,36 @@ jobs:
 
       - name: Check Formatting
         run: |
+          cd correct_dag_module_name
           cargo fmt --all -- --check
 
       - name: Run Linter (Clippy)
-        run: cargo clippy -- -D warnings -A dead_code -A clippy::upper_case_acronyms
+        run: |
+          cd correct_dag_module_name
+          cargo clippy -- -D warnings -A dead_code -A clippy::upper_case_acronyms
 
       - name: Build
-        run: cargo build --verbose
+        run: |
+          cd correct_dag_module_name
+          cargo build --verbose
 
       - name: Run DAG Module Unit Tests
-        run: cargo test --lib --verbose
+        run: |
+          cd correct_dag_module_name
+          cargo test --lib --verbose
 
       - name: Run DAG Module Integration Tests
-        run: cargo test --tests --verbose
+        run: |
+          cd correct_dag_module_name
+          cargo test --tests --verbose
 
       - name: Install cargo-tarpaulin
         uses: taiki-e/install-action@cargo-tarpaulin
 
       - name: Generate DAG Coverage Report
-        run: cargo tarpaulin --verbose --workspace --out Xml
+        run: |
+          cd correct_dag_module_name
+          cargo tarpaulin --verbose --workspace --out Xml
 
       - name: Upload DAG coverage to Codecov
         uses: codecov/codecov-action@v3
@@ -62,19 +73,25 @@ jobs:
           files: cobertura.xml
 
       - name: Verify Codecov upload
-        run: echo \"DAG Module coverage report uploaded to Codecov.\"
+        run: echo "DAG Module coverage report uploaded to Codecov."
 
       - name: Run DAG Tests with All Features (Release)
-        run: cargo test --all-features --release
+        run: |
+          cd correct_dag_module_name
+          cargo test --all-features --release
 
       - name: Run DAG Benchmarks
-        run: cargo bench
+        run: |
+          cd correct_dag_module_name
+          cargo bench
 
       - name: Install cargo-audit
         run: cargo install cargo-audit
 
       - name: Security Audit
-        run: cargo audit
+        run: |
+          cd correct_dag_module_name
+          cargo audit
 
       - name: Slack Notification
         uses: 8398a7/action-slack@v3
