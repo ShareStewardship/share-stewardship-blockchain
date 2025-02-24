@@ -2,9 +2,9 @@ name: Rust CI
 
 on:
   push:
-    branches: [ ss-dag-development ]
+    branches: [ main, ss-dag-development ]
   pull_request:
-    branches: [ ss-dag-development ]
+    branches: [ main, ss-dag-development ]
   schedule:
     - cron: '0 0 * * 0'
 
@@ -75,27 +75,6 @@ jobs:
       - name: Security Audit
         run: cargo audit
 
-      - name: Slack Notification
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          fields: repo,commit,message,job,took
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-      - name: Tag and Release
-        if: success()
-        uses: anothrNick/github-tag-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WITH_V: true
-
-      - name: Generate Changelog
-        if: success()
-        uses: heinrichreimer/github-changelog-generator-action@v2.3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
   codeql-analysis:
     name: CodeQL Analysis
     runs-on: ubuntu-latest
@@ -118,11 +97,3 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
-
-      - name: Slack Notification
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          fields: repo,commit,message,job,took
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
